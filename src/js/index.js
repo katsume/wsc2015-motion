@@ -15,6 +15,6 @@ document.addEventListener('DOMContentLoaded', function(){
 		e.preventDefault();
 
 		motion.move(e.deltaY);
-		renderer.render(motion.getData());
+		renderer.render(motion.getPoints());
 	});
 });

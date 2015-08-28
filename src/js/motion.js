@@ -1,12 +1,4 @@
-var _= require('underscore'),
-	$= require('jquery');
-
-var DIMENTIONS= 3,
-	POINTS_PER_FIGURE= 13;
-
-var NUM_OF_INTERPOLATION= 3;
-
-var NUM_OF_SEGMENTS= 7;
+var $= require('jquery');
 
 var Motion= function(){
 
@@ -22,7 +14,12 @@ Motion.prototype._fetch= function(){
 		url: './walk.txt',
 		context: this,
 		success: function(data){
-			this._data= this._parseData(data);
+
+			var parsedData= this._parse(data),
+				interpolatedData= this._interpolate(parsedData),
+				averagePositions= this._getAveragePositions(interpolatedData);
+
+			this._data= interpolatedData;
 		},
 		error: function(jqXHR, textStatus, errorThrown){
 			throw new Error(textStatus+' : '+errorThrown);
@@ -30,168 +27,54 @@ Motion.prototype._fetch= function(){
 	});
 };
 
-Motion.prototype._parseData= function(src){
+Motion.prototype._parse= require('./motion-parse');
 
-	var lines= src.trim().split('\n'),
-		frame= [],
-		frames= [],
-		scale= 1;
+Motion.prototype._interpolate= require('./motion-interpolate');
 
-	lines.forEach(function(line){
-		var components= line.trim().split('\t');
+Motion.prototype._getAveragePositions= require('./motion-averagePosition.js');
 
-		components= components.map(function(component){
-			return Number(component)*scale;
-		});
-
-		//	Right
-		frame.push([
-			-components[0],
-			-components[2],
-			components[1]
-		]);
-
-		//	Front
-		// frame.push([
-		// 	components[1],
-		// 	-components[2],
-		// 	components[0]
-		// ]);
-
-		if(frame.length>=POINTS_PER_FIGURE){
-			frames.push(frame);
-			frame= [];
-		}
-	});
-
-	this._interpolate(frames);
-
-	this._arrange(frames);
-
-	return frames;
-};
-
-Motion.prototype._interpolate= function(data){
-
-	var i;
-
-	var currentFrame,
-		nextFrame,
-		newFrames;
-
-	for(i=data.length-1; 0<=i; i--){
-
-		currentFrame= data[i];
-		nextFrame= i<data.length-1 ? data[i+1] : data[0];
-		newFrames= this._interpolateFrame(currentFrame, nextFrame);
-
-		data.splice.apply(data, [i+1, 0].concat(newFrames));
-	}
-};
-
-Motion.prototype._interpolateFrame= function(currentFrame, nextFrame){
-
-	var i,
-		j;
-
-	var newFrames= [];
-
-	var currentPoint,
-		nextPoint,
-		newPoint;
-
-	_.times(NUM_OF_INTERPOLATION, function(){
-		newFrames.push([]);
-	});
-
-	for(i=0; i<currentFrame.length; i++){
-
-		currentPoint= currentFrame[i];
-		nextPoint= nextFrame[i];
-
-		for(j=0; j<NUM_OF_INTERPOLATION; j++){
-
-			newPoint= currentPoint.map(function(component, index){
-				return component*((NUM_OF_INTERPOLATION-j)/(NUM_OF_INTERPOLATION+1))+nextPoint[index]*((j+1)/(NUM_OF_INTERPOLATION+1));
-			});
-
-			newFrames[j].push(newPoint);
-		}
-
-	}
-
-	return newFrames;
-};
-
-Motion.prototype._arrange= function(data){
-
-	var averagePoints= [],
-		numOfPoints= [];
-
-	_.times(NUM_OF_SEGMENTS, function(){
-		averagePoints.push([0, 0, 0]);
-		numOfPoints.push(0);
-	});
-
-	data.forEach(function(frame){
-
-		frame.forEach(function(point, index){
-
-			switch (index) {
-				case 0:
-					averagePoints[0]= averagePoints[0].sum(point);
-					numOfPoints[0]++;
-					break;
-				case 1:
-				case 2:
-					averagePoints[1]= averagePoints[1].sum(point);
-					numOfPoints[1]++;
-					break;
-				case 3:
-				case 4:
-					averagePoints[2]= averagePoints[2].sum(point);
-					numOfPoints[2]++;
-					break;
-				case 5:
-				case 6:
-					averagePoints[3]= averagePoints[3].sum(point);
-					numOfPoints[3]++;
-					break;
-				case 7:
-				case 8:
-					averagePoints[4]= averagePoints[4].sum(point);
-					numOfPoints[4]++;
-					break;
-				case 9:
-				case 10:
-					averagePoints[5]= averagePoints[5].sum(point);
-					numOfPoints[5]++;
-					break;
-				case 11:
-				case 12:
-					averagePoints[6]= averagePoints[6].sum(point);
-					numOfPoints[6]++;
-					break;
-				default:
-			}
-		}, this);
-	}, this);
-
-	averagePoints= averagePoints.map(function(averagePoint, index){
-	 	return averagePoint.map(function(component){
-			return component/numOfPoints[index];
-		});
-	});
-
-	// console.log(averagePoints);
-};
-
-Array.prototype.sum= function(p){
-
-	return this.map(function(component, index){
-		return component+p[index];
-	});
-};
+// Motion.prototype._arrange= function(data){
+//
+// 	var averagePositions= this._getAveragePositions(data);
+//
+// 	return;
+// 	data.forEach(function(frame){
+//
+// 		frame.forEach(function(point, index){
+//
+// 			switch (index) {
+// 				case 0:
+// 					point[1]= averagePositions[0][1];
+// 					break;
+// 				case 1:
+// 				case 2:
+// 					point[1]= averagePositions[1][1];
+// 					break;
+// 				case 3:
+// 				case 4:
+// 					point[1]= averagePositions[2][1];
+// 					break;
+// 				case 5:
+// 				case 6:
+// 					point[1]= averagePositions[3][1];
+// 					break;
+// 				case 7:
+// 				case 8:
+// 					point[1]= averagePositions[4][1];
+// 					break;
+// 				case 9:
+// 				case 10:
+// 					point[1]= averagePositions[5][1];
+// 					break;
+// 				case 11:
+// 				case 12:
+// 					point[1]= averagePositions[6][1];
+// 					break;
+// 				default:
+// 			}
+// 		}, this);
+// 	}, this);
+// };
 
 // Motion.prototype.loop= function(){
 //
@@ -211,7 +94,8 @@ Motion.prototype.move= function(delta){
 		return;
 	}
 
-	this._index+= delta/Math.abs(delta);
+	var diff= delta<0 ? -1 : 1;
+	this._index+= diff;
 
 	if(this._index<0){
 		this._index= this._data.length-1;
@@ -220,7 +104,7 @@ Motion.prototype.move= function(delta){
 	}
 };
 
-Motion.prototype.getData= function(){
+Motion.prototype.getPoints= function(){
 	return this._data[this._index];
 };
 
