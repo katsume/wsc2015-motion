@@ -10,7 +10,9 @@ gulp.task('watch', function(){
 	browserSync({
 		server: {
 			baseDir: config.dest
-		}
+		},
+		notify: false,
+		ghostMode: false
 	});
 
 	watch(path.relative('.', config.webpack.src), function(){
