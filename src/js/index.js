@@ -1,62 +1,20 @@
-var Motion= require('./motion');
+var Motion= require('./motion'),
+	Renderer= require('./renderer');
 
 String.prototype.trim= function(){
 	return this.replace(/^\s+|\s+$/g, "");
 };
 
-var Renderer= function(elm){
-
-	var canvas= document.createElement('canvas');
-	elm.appendChild(canvas);
-
-	window.addEventListener('resize', this._resizeHandler.bind(this));
-
-	this._canvas= canvas;
-	this._context= canvas.getContext('2d');
-	this._resizeHandler();
-};
-
-Renderer.prototype._resizeHandler= function(){
-
-	this._canvas.width= window.innerWidth;
-	this._canvas.height= window.innerHeight;
-};
-
-Renderer.prototype.render= function(data){
-
-	if(!data || !data.length){
-		return;
-	}
-
-	var context= this._context,
-		size= 4,
-		ox= this._canvas.width/2,
-		oy= this._canvas.height/2;
-
-	context.fillStyle= 'white';
-	context.clearRect(0, 0, this._canvas.width, this._canvas.height);
-
-	data.forEach(function(point){
-		context.fillRect(ox+point[0]-size/2, oy+point[1]-size/2, size, size);
-	});
-};
-
-var motion= new Motion();
-
 document.addEventListener('DOMContentLoaded', function(){
 	'use strict';
 
-	var renderer= new Renderer(document.querySelector('.stage'));
+	var motion= new Motion(),
+		renderer= new Renderer(document.querySelector('.stage'));
 
-	var flg= false;
-	var loop= function(){
+	document.body.addEventListener('mousewheel', function(e){
+		e.preventDefault();
 
-		if(flg= !flg){
-			motion.loop();
-			renderer.render(motion.getData());
-		}
-
-		requestAnimationFrame(loop);
-	};
-	loop();
+		motion.move(e.deltaY);
+		renderer.render(motion.getData());
+	});
 });
