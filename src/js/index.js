@@ -23,8 +23,42 @@ document.addEventListener('DOMContentLoaded', function(){
 	});
 
 	document.body.addEventListener('mousewheel', function(e){
+
+		if(timeoutID){
+			clearTimeout(timeoutID);
+			timeoutID= null;
+		}
+		if(intervalID){
+			clearInterval(intervalID);
+			intervalID= null;
+		}
+
+		timeoutID= setTimeout(runAuto, 90000);
+
 		e.preventDefault();
 		motion.move(e.deltaY);
 		requestAnimationFrame(render);
 	});
+
+	var timeoutID= null,
+		intervalID= null;
+
+	var runAuto= function(){
+
+		if(navigator.userAgent.match(/iPhone|iPad|iPod/i)){
+			return;
+		}
+
+		if(intervalID){
+			clearInterval(intervalID);
+			intervalID= null;
+		}
+
+		intervalID= setInterval(function(){
+			motion.move(1, true);
+			requestAnimationFrame(render);
+		}, 16);
+	};
+	runAuto();
+
 });

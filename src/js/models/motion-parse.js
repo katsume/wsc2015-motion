@@ -5,9 +5,7 @@ var Context= require('./context');
 module.exports= function(src){
 
 	var lines= src.trim().split('\n'),
-		// frame= [],
-		// frames= [],
-		scale= 1.5;
+		scale= Context.SCALE;
 
 	var points= new Array(Context.POINTS_PER_FIGURE),
 		currentPointIndex= 0;
@@ -42,10 +40,6 @@ module.exports= function(src){
 			currentPointIndex= 0;
 		}
 
-		// if(frame.length>=POINTS_PER_FIGURE){
-		// 	frames.push(frame);
-		// 	frame= [];
-		// }
 	});
 
 	points= _.filter(points, function(point, index){

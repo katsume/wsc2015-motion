@@ -45,7 +45,7 @@ Motion.prototype._parse= require('./motion-parse');
 
 Motion.prototype._interpolate= require('./motion-interpolate');
 
-Motion.prototype.move= function(delta){
+Motion.prototype.move= function(delta, flg){
 
 	if(!this.points || !this.points.length){
 		return;
@@ -53,7 +53,9 @@ Motion.prototype.move= function(delta){
 
 	this.currentFrameIndex= Math.wrap(this.currentFrameIndex+Math.sign(delta), 0, this.numOfFrames-1);
 
-	this._socket.emit('walk', this.currentFrameIndex);
+	if(!flg){
+		this._socket.emit('walk', this.currentFrameIndex);
+	}
 };
 
 _.extend(Motion.prototype, Backbone.Events);

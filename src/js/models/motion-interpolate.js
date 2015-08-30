@@ -1,15 +1,16 @@
-var NUM_OF_INTERPOLATION= 3;
+var Context= require('./context');
 
 var interpolateFrame= function(currentFrame, nextFrame){
 
 	var i,
 		newFrames= [],
-		newFrame;
+		newFrame,
+		numOfInterpolation= Context.NUM_OF_INTERPOLATION;
 
-	for(i=0; i<NUM_OF_INTERPOLATION; i++){
+	for(i=0; i<numOfInterpolation; i++){
 
 		newFrame= currentFrame.map(function(component, index){
-			return component*((NUM_OF_INTERPOLATION-i)/(NUM_OF_INTERPOLATION+1))+nextFrame[index]*((i+1)/(NUM_OF_INTERPOLATION+1));
+			return component*((numOfInterpolation-i)/(numOfInterpolation+1))+nextFrame[index]*((i+1)/(numOfInterpolation+1));
 		});
 
 		newFrames.push(newFrame);

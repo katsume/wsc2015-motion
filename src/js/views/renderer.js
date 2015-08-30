@@ -22,6 +22,10 @@ Renderer.prototype._resizeHandler= function(){
 	var width= window.innerWidth,
 		height= window.innerHeight;
 
+	if(!navigator.userAgent.match(/iPhone|iPad|iPod/i)){
+		width/= 2;
+	}
+
 	this._width= this._canvas.width= width;
 	this._height= this._canvas.height= height;
 	this._ox= width/2;
@@ -50,6 +54,10 @@ Renderer.prototype.render= function(){
 };
 
 Renderer.prototype._renderVerticalLines= function(){
+
+	if(Context.VERTICAL_LINE_WIDTH<=0){
+		return;
+	}
 
 	var context= this._context,
 		currentFrameIndex= this._model.currentFrameIndex,
@@ -118,6 +126,10 @@ Renderer.prototype._renderVerticalLine= function(point, currentFrameIndex, numOf
 
 Renderer.prototype._renderHorizontalLines= function(){
 
+	if(Context.HORIZONTAL_LINE_WIDTH<=0){
+		return;
+	}
+
 	var context= this._context,
 		currentFrameIndex= this._model.currentFrameIndex;
 
@@ -139,6 +151,10 @@ Renderer.prototype._renderHorizontalLine= function(p, context){
 };
 
 Renderer.prototype._renderPoints= function(){
+
+	if(Context.POINT_SIZE<=0){
+		return;
+	}
 
 	var context= this._context,
 		currentFrameIndex= this._model.currentFrameIndex;
